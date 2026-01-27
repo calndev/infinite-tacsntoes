@@ -1,3 +1,3 @@
 # Infinite TicsNToes
 
-its fucking self explanatory dumbass
+uhh its self explanatory (im just lazy)
