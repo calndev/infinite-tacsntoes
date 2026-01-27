@@ -5,31 +5,15 @@ const { useState, useEffect, useRef } = React;
       const [isXNext, setIsXNext] = useState(true);
       const [xMoves, setXMoves] = useState([]);
       const [oMoves, setOMoves] = useState([]);
-      const [gameMode, setGameMode] = useState('menu'); // menu, local, ai, hosting, joining, playing
+      const [gameMode, setGameMode] = useState('menu');
       const [myPeerId, setMyPeerId] = useState('');
       const [roomCode, setRoomCode] = useState('');
       const [joinCode, setJoinCode] = useState('');
       const [isHost, setIsHost] = useState(false);
-      const [mySymbol, setMySymbol] = useState(null); // 'X' or 'O'
+      const [mySymbol, setMySymbol] = useState(null);
       const [connectionStatus, setConnectionStatus] = useState('');
       const [isAIThinking, setIsAIThinking] = useState(false);
-      const [playerScore, setPlayerScore] = useState(0);
-      const [opponentScore, setOpponentScore] = useState(0);
-      const [showOpponentLeftModal, setShowOpponentLeftModal] = useState(false);
-      
-      const peerRef = useRef(null);
-      const connRef = useRef(null);
 
-      useEffect(() => {
-        return () => {
-          if (connRef.current) {
-            connRef.current.close();
-          }
-          if (peerRef.current) {
-            peerRef.current.destroy();
-          }
-        };
-      }, []);
 
       const calculateWinner = (squares) => {
         const lines = [
@@ -71,7 +55,6 @@ const { useState, useEffect, useRef } = React;
         setIsAIThinking(true);
         
         setTimeout(() => {
-          // Get all empty squares
           const emptySquares = currentBoard
             .map((cell, idx) => cell === null ? idx : null)
             .filter(idx => idx !== null);
@@ -81,28 +64,23 @@ const { useState, useEffect, useRef } = React;
             return;
           }
 
-          // Simple AI: Check for winning move, then blocking move, then random
           const aiSymbol = 'O';
           const playerSymbol = 'X';
           
-          // Check if AI can win
           let bestMove = findWinningMove(currentBoard, aiSymbol);
           
-          // If not, check if need to block player
           if (bestMove === null) {
             bestMove = findWinningMove(currentBoard, playerSymbol);
           }
           
-          // If neither, pick center or random
           if (bestMove === null) {
             if (emptySquares.includes(4)) {
-              bestMove = 4; // Center
+              bestMove = 4;
             } else {
               bestMove = emptySquares[Math.floor(Math.random() * emptySquares.length)];
             }
           }
 
-          // Make the move
           const newBoard = [...currentBoard];
           const aiMoves = [...currentOMoves];
           
@@ -118,7 +96,7 @@ const { useState, useEffect, useRef } = React;
           setOMoves(aiMoves);
           setIsXNext(true);
           setIsAIThinking(false);
-        }, 500); // Small delay to make it feel more natural
+        }, 500);
       };
 
       const findWinningMove = (currentBoard, symbol) => {
@@ -134,7 +112,6 @@ const { useState, useEffect, useRef } = React;
           const symbolCount = values.filter(v => v === symbol).length;
           const nullCount = values.filter(v => v === null).length;
 
-          // If two of the symbol and one empty, that's a winning/blocking move
           if (symbolCount === 2 && nullCount === 1) {
             if (currentBoard[a] === null) return a;
             if (currentBoard[b] === null) return b;
@@ -145,7 +122,6 @@ const { useState, useEffect, useRef } = React;
       };
 
       const handleAIClick = (index) => {
-        // Only allow player move if it's X's turn and not AI thinking
         if (!isXNext || board[index] || calculateWinner(board) || isAIThinking) {
           return;
         }
@@ -165,9 +141,7 @@ const { useState, useEffect, useRef } = React;
         setXMoves(playerMoves);
         setIsXNext(false);
 
-        // Check if player won
         if (!calculateWinner(newBoard)) {
-          // AI's turn
           makeAIMove(newBoard, playerMoves, oMoves, false);
         }
       };
@@ -199,7 +173,6 @@ const { useState, useEffect, useRef } = React;
       };
 
       const handleOnlineClick = (index) => {
-        // Check if it's my turn
         const isMyTurn = (mySymbol === 'X' && isXNext) || (mySymbol === 'O' && !isXNext);
         
         if (!isMyTurn || board[index] || calculateWinner(board)) {
@@ -226,7 +199,6 @@ const { useState, useEffect, useRef } = React;
         setOMoves(newOMoves);
         setIsXNext(!isXNext);
 
-        // Send move to opponent
         sendGameState({
           type: 'move',
           board: newBoard,
@@ -237,7 +209,6 @@ const { useState, useEffect, useRef } = React;
       };
 
       const resetGame = () => {
-        // Check if there was a winner before resetting
         const currentWinner = calculateWinner(board);
         if (currentWinner) {
           if (gameMode === 'ai') {
@@ -273,7 +244,6 @@ const { useState, useEffect, useRef } = React;
       };
 
       const createRoom = () => {
-        // Generate simple 6 character code
         const simpleCode = Math.random().toString(36).substring(2, 8).toUpperCase();
         
         const peer = new Peer(simpleCode);
@@ -409,7 +379,6 @@ const { useState, useEffect, useRef } = React;
         }
       }
 
-      // Menu Screen
       if (gameMode === 'menu') {
         return (
           <div className="flex flex-col items-center justify-center min-h-screen bg-neutral-950 p-4">
@@ -464,15 +433,8 @@ const { useState, useEffect, useRef } = React;
                                hover:bg-neutral-700 transition-all duration-150"
                   >
                     Join Room
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      }
 
-      // Hosting/Joining Screen
+
       if (gameMode === 'hosting' || gameMode === 'joining') {
         return (
           <div className="flex flex-col items-center justify-center min-h-screen bg-neutral-950 p-4">
@@ -517,7 +479,6 @@ const { useState, useEffect, useRef } = React;
         );
       }
 
-      // Game Screen
       return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-neutral-950 p-4">
           <div className="w-full max-w-md">
@@ -611,7 +572,6 @@ const { useState, useEffect, useRef } = React;
             </div>
           </div>
           
-          {/* Opponent Left Modal */}
           {showOpponentLeftModal && (
             <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
               <div className="bg-neutral-900 border border-neutral-800 p-8 max-w-sm w-full mx-4">
