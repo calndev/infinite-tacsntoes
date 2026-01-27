@@ -140,7 +140,7 @@ const { useState, useEffect, useRef } = React;
         setBoard(newBoard);
         setXMoves(playerMoves);
         setIsXNext(false);
-        
+
         if (!calculateWinner(newBoard)) {
           makeAIMove(newBoard, playerMoves, oMoves, false);
         }
