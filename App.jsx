@@ -438,7 +438,7 @@ const { useState, useEffect, useRef } = React;
             </div>
         </div>
         </div>
-        )
+        )};
 
 
         if (gameMode === 'hosting' || gameMode === 'joining') {
@@ -598,4 +598,4 @@ const { useState, useEffect, useRef } = React;
             </div>
           )}
         </div>
-      )}}
+      )}
