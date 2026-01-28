@@ -1,3 +1,9 @@
+const CACHE_NAME = 'tacsntoes-v3';
+const urlsToCache = [
+  './',
+  './index.html'
+];
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
