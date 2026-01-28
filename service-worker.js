@@ -1,4 +1,3 @@
-const CACHE_NAME = 'tacsntoes-v2';
 const urlsToCache = [
   './',
   './index.html',
