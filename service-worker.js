@@ -1,11 +1,3 @@
-const urlsToCache = [
-  './',
-  './index.html',
-  './App.jsx',
-  './styles.css',
-  './manifest.json'
-];
-
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
